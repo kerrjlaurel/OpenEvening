@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro:bit Sorting Hat Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+        
+        @page {
+            size: A4;
+            margin: 15mm 15mm;
+        }
+
+        body {
+            background-color: #f4ebd8; /* Parchment style */
+            background-image: radial-gradient(circle at center, #fdf8eb 0%, #e8d5b5 100%);
+            color: #2c1e16;
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px solid #5a3d2b;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        
+        .header-image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Cinzel', serif;
+            color: #4a2e1b;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            border-bottom: 2px solid #5a3d2b;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        h2 {
+            text-align: left;
+            border-bottom: 1px dashed #5a3d2b;
+            padding-bottom: 5px;
+            margin-top: 35px;
+            font-size: 1.8em;
+        }
+        
+        .step {
+            background-color: #fdfaf3;
+            border-left: 6px solid #8b0000;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .step h3 {
+            margin-top: 0;
+            color: #8b0000;
+        }
+        
+        .code-block {
+            background-color: #ffffff;
+            border: 1px solid #d3c4a9;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .challenge {
+            background-color: #e3decd;
+            border: 2px dashed #4b5320;
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        
+        .challenge h3 {
+            margin-top: 0;
+            color: #4b5320;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 40px;
+            font-style: italic;
+            color: #5a3d2b;
+            border-top: 1px solid #d3c4a9;
+            padding-top: 20px;
+        }
+        
+        .house-colors {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .house {
+            padding: 8px 20px;
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .gryffindor { background-color: #7F0909; }
+        .slytherin { background-color: #0D6217; }
+        .ravenclaw { background-color: #000A90; }
+        .hufflepuff { background-color: #EEE117; color: #333; }
+
+        @media print {
+            body {
+                background-color: white;
+                background-image: none;
+            }
+            .page-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                background-color: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="header-image">
+            <img src="Delta_Laurel_HP.jpg" alt="Delta - The Laurel Academy">
+        </div>
+        
+        <h1>Build a Sorting Hat Simulator</h1>
+        
+        <p>Welcome to your next Computing challenge! Today, we will program our BBC micro:bits to act just like the famous magical Sorting Hat. When you shake the micro:bit, it will magically assign you to one of the four houses.</p>
+        
+        <div class="house-colors">
+            <span class="house gryffindor">Gryffindor</span>
+            <span class="house slytherin">Slytherin</span>
+            <span class="house ravenclaw">Ravenclaw</span>
+            <span class="house hufflepuff">Hufflepuff</span>
+        </div>
+
+        <h2>What You Need</h2>
+        <ul>
+            <li>1x BBC micro:bit and battery pack</li>
+            <li>1x USB Cable</li>
+            <li>MakeCode Editor (makecode.microbit.org)</li>
+        </ul>
+
+        <h2>Step-by-Step Instructions</h2>
+        
+        <div class="step">
+            <h3>Step 1: The Trigger</h3>
+            <p>How does the Sorting Hat know when to sort? We need an input! Open a new project in MakeCode and find the <strong>Input</strong> menu.</p>
+            <p>Drag an <code>on shake</code> block into your workspace. Anything we put inside this block will run when the micro:bit is shaken.</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: The Magic (Variables & Random Numbers)</h3>
+            <p>The hat needs to make a choice. We will use a <strong>Variable</strong> to store this choice. Go to the Variables menu and create a new variable called <code>house</code>.</p>
+            <p>Drag the <code>set house to</code> block into your <code>on shake</code> block. Then, go to the Math menu and snap a <code>pick random</code> block into the value space. Set the numbers from <strong>1 to 4</strong>.</p>
+            <div class="code-block">
+                on shake:<br>
+                &nbsp;&nbsp;set [house] to (pick random 1 to 4)
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: The Logic (Selection)</h3>
+            <p>Now we need <strong>Selection</strong> (If/Else statements) to decide what happens for each number. Go to the Logic menu and grab an <code>if / else</code> block.</p>
+            <p>Click the <strong>(+)</strong> button on the block until you have slots for all four houses. Build the logic like this:</p>
+            <div class="code-block">
+                if [house] = 1 then:<br>
+                &nbsp;&nbsp;show string "GRYFFINDOR!"<br>
+                else if [house] = 2 then:<br>
+                &nbsp;&nbsp;show string "SLYTHERIN!"<br>
+                else if [house] = 3 then:<br>
+                &nbsp;&nbsp;show string "RAVENCLAW!"<br>
+                else:<br>
+                &nbsp;&nbsp;show string "HUFFLEPUFF!"
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Test and Download</h3>
+            <p>Test your code in the on-screen simulator by clicking the "SHAKE" button. If it works, download the <code>.hex</code> file and flash it onto your micro:bit!</p>
+        </div>
+
+        <div class="challenge">
+            <h3>🧙‍♂️ Extension Challenge</h3>
+            <p>Finished early? Try adding a custom icon for each house before the name scrolls across the screen! (e.g., a snake for Slytherin, a lion for Gryffindor). If you have a V2 micro:bit, can you make it play a magical sound effect when it sorts?</p>
+        </div>
+
+        <div class="footer">
+            Computing Department | The Laurel Academy
+        </div>
+    </div>
+</body>
+</html>
