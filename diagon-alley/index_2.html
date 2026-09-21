@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O.W.L. Typing Exam</title>
+    
+    
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f4f1ea;
+            color: #2c2f33;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid #d4af37;
+        }
+        
+        .school-logo {
+            max-width: 80%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        }
+
+        h1 { color: #5d0000; margin-top: 10px; }
+        
+        .typing-area-wrapper {
+            position: relative;
+            margin: 20px 0;
+            cursor: text;
+        }
+        
+        #text-display {
+            font-size: 1.6em;
+            line-height: 1.6;
+            text-align: left;
+            background: #eee;
+            padding: 25px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace; 
+            user-select: none;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .char { color: #a0a0a0; }
+        .char.correct { color: #1A472A; font-weight: bold; } 
+        
+        .char.incorrect { color: #740001 !important; background-color: #ffcdd2; border-radius: 3px; } 
+        
+        .char.active { 
+            border-bottom: 3px solid #d4af37; 
+            color: #2c2f33;
+            animation: blink 1s infinite; 
+        }
+        
+        @keyframes blink { 
+            50% { border-color: transparent; } 
+        }
+
+        #hidden-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; z-index: -1; cursor: text;
+        }
+
+        input[type="text"]:not(#hidden-input) {
+            width: 90%;
+            padding: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #d4af37;
+            color: white;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #b5952f; }
+        #test-area, #results-area { display: none; }
+        
+        .stat { font-weight: bold; color: #5d0000; font-size: 1.2em;}
+        
+        .candidate-tag {
+            text-align: left;
+            color: #1A472A; 
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel Academy Logo" class="school-logo">
+
+    <h1>✨ Hogwarts O.W.L. Typing Exam ✨</h1>
+    
+    <div id="setup-area">
+        <p>Enter your name to begin your examination:</p>
+        <input type="text" id="wizard-name" placeholder="E.g. Hermione Granger" autocomplete="off">
+        <br>
+        <!-- ⚠️ NEW: Scroll Icon Added -->
+        <button onclick="startSetup()">📜 Prepare Scroll</button>
+    </div>
+
+    <div id="test-area">
+        <!-- ⚠️ NEW: Quill Icon Added -->
+        <h3 class="candidate-tag" id="candidate-display">🪶 Candidate: </h3>
+        
+        <p>Type the magical incantation below. The timer starts on your first keystroke!</p>
+        <p style="font-size: 0.9em; color: #666;"><em>(Click the text if you lose your cursor)</em></p>
+        
+        <div class="typing-area-wrapper" onclick="document.getElementById('hidden-input').focus()">
+            <div id="text-display"></div>
+            <input type="text" id="hidden-input" autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+
+    <div id="results-area">
+        <h2>⚡ Mischief Managed! ⚡</h2>
+        <p>Time Taken: <span class="stat" id="time-display"></span> seconds</p>
+        <p>Typing Speed: <span class="stat" id="wpm-display"></span> WPM</p>
+        <p>Spell Accuracy: <span class="stat" id="accuracy-display"></span>%</p>
+        <br>
+        <p><em>Your results have been sent to the Diagon Alley archives!</em></p>
+        <!-- ⚠️ NEW: Wand Icon Added -->
+        <button onclick="location.reload()">🪄 Next Wizard</button>
+    </div>
+</div>
+
+<script>
+    const targetText = "We are pleased to inform you that you have a place at Hogwarts School of Witchcraft and Wizardry.";
+    const displayArea = document.getElementById('text-display');
+    const hiddenInput = document.getElementById('hidden-input');
+    const nameInput = document.getElementById('wizard-name');
+    
+    let startTime, endTime, timerStarted = false;
+    let wizardName = "";
+    
+    let currentIndex = 0;
+    let errorCount = 0;
+
+    nameInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            startSetup();
+        }
+    });
+
+    function initializeText() {
+        displayArea.innerHTML = '';
+        targetText.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.innerText = char;
+            span.classList.add('char');
+            if (index === 0) span.classList.add('active');
+            displayArea.appendChild(span);
+        });
+        
+        currentIndex = 0;
+        errorCount = 0;
+        timerStarted = false;
+    }
+
+    function startSetup() {
+        wizardName = nameInput.value.trim();
+        if (!wizardName) return alert("Please enter your name!");
+        
+        // ⚠️ NEW: Ensure the quill stays when the name is updated
+        document.getElementById('candidate-display').innerText = "🪶 Candidate: " + wizardName;
+        
+        document.getElementById('setup-area').style.display = 'none';
+        document.getElementById('test-area').style.display = 'block';
+        
+        initializeText();
+        hiddenInput.value = "";
+        hiddenInput.focus();
+    }
+
+    hiddenInput.addEventListener('input', () => {
+        if (!timerStarted) {
+            startTime = new Date();
+            timerStarted = true;
+        }
+
+        const inputVal = hiddenInput.value;
+        const spans = displayArea.querySelectorAll('.char');
+        
+        if (inputVal.length < currentIndex) {
+            hiddenInput.value = targetText.substring(0, currentIndex);
+            return;
+        }
+
+        const typedChar = inputVal.slice(-1);
+        const expectedChar = targetText[currentIndex];
+
+        if (typedChar === expectedChar) {
+            spans[currentIndex].classList.remove('active', 'incorrect');
+            spans[currentIndex].classList.add('correct');
+            
+            currentIndex++;
+            
+            if (currentIndex < targetText.length) {
+                spans[currentIndex].classList.add('active');
+            } else {
+                endTime = new Date();
+                hiddenInput.disabled = true;
+                calculateAndSave();
+            }
+        } else {
+            errorCount++;
+            hiddenInput.value = targetText.substring(0, currentIndex);
+            spans[currentIndex].classList.add('incorrect');
+        }
+    });
+
+    function calculateAndSave() {
+        const timeTakenSec = ((endTime - startTime) / 1000).toFixed(2);
+        
+        const totalKeystrokes = targetText.length + errorCount;
+        const accuracy = Math.round((targetText.length / totalKeystrokes) * 100);
+
+        const wordCount = targetText.split(' ').length;
+        const wpm = Math.round((wordCount / (timeTakenSec / 60)));
+
+        document.getElementById('test-area').style.display = 'none';
+        document.getElementById('results-area').style.display = 'block';
+        
+        document.getElementById('time-display').innerText = timeTakenSec;
+        document.getElementById('wpm-display').innerText = wpm;
+        document.getElementById('accuracy-display').innerText = accuracy;
+
+        const record = {
+            name: wizardName,
+            time_seconds: parseFloat(timeTakenSec),
+            wpm: wpm,
+            accuracy: accuracy, 
+            timestamp: new Date().toISOString()
+        };
+
+        fetch('save_score.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(record)
+        }).then(response => {
+            console.log("Saved to Diagon Alley archives!");
+        }).catch(error => {
+            console.error("Error saving score:", error);
+        });
+    }
+</script>
+
+</body>
+</html>

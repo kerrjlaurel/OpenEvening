@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Code Editor - Ollivanders</title>
+    
+    <style>
+        /* Base styles for the wrapper page */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212;
+        }
+        
+        #preview-frame { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            background: #fff;
+        }
+        
+        #editor-drawer {
+            position: fixed;
+            top: 0;
+            right: -50vw; 
+            width: 50vw;
+            height: 100%;
+            background: #1e1e1e;
+            color: #fff;
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.6);
+            z-index: 1000;
+        }
+        
+        #editor-drawer.open {
+            right: 0;
+        }
+        
+        #editor-header {
+            padding: 15px;
+            background: #2d2d2d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        #editor-header h3 { 
+            margin: 0; 
+            font-size: 18px; 
+            color: #4CAF50; 
+        }
+        
+        #code-editor {
+            flex-grow: 1;
+            width: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border: none;
+            padding: 15px;
+            box-sizing: border-box;
+            resize: none;
+            outline: none;
+        }
+        
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .btn:hover { background: #45a049; }
+        
+        #toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <iframe id="preview-frame"></iframe>
+
+    <button id="toggle-btn" class="btn">💻 Open Code Editor</button>
+
+    <div id="editor-drawer">
+        <div id="editor-header">
+            <h3>HTML / CSS / JS Editor</h3>
+            <div>
+                <button class="btn" id="run-btn">▶ Run Code</button>
+                <button class="btn" style="background:#f44336; margin-left:10px;" id="close-btn">✖ Close</button>
+            </div>
+        </div>
+
+        <textarea id="code-editor" spellcheck="false">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollivanders' Wand Selector</title>
+    <style>
+        /* =========================================================
+           🪄 STUDENT TASK 1: CSS (CASCADING STYLE SHEETS)
+           Change the background color to match your Hogwarts House!
+           Gryffindor: #740001
+           Slytherin:  #1A472A
+           Ravenclaw:  #0E1A40
+           Hufflepuff: #EEB939
+        ========================================================= */
+        body {
+            background-color: #d4c4a8; 
+            font-family: 'Georgia', serif;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+
+        /* 🪄 STUDENT TASK 2: Change the border thickness or color */
+        .shop-container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 5px solid #4a3525; 
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+        }
+
+        select, button {
+            font-size: 1.2rem;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4a3525;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #2e2117;
+        }
+        .school-logo {
+            max-width: 80%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        #wand-result {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-style: italic;
+            font-weight: bold;
+            color: #4a3525;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shop-container">
+        <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel Academy Logo" class="school-logo">
+        
+        <h1>Ollivanders: Makers of Fine Wands</h1>
+        <p>Enter your traits below to let the wand choose the wizard...</p>
+
+        <label for="core">Select your preferred core:</label><br>
+        <select id="core">
+            <option value="Dragon Heartstring">Dragon Heartstring</option>
+            <option value="Phoenix Feather">Phoenix Feather</option>
+            <option value="Unicorn Hair">Unicorn Hair</option>
+        </select>
+        <br><br>
+
+        <label for="flexibility">Wand flexibility:</label><br>
+        <select id="flexibility">
+            <option value="Rigid">Rigid</option>
+            <option value="Swishy">Swishy</option>
+            <option value="Springy">Springy</option>
+        </select>
+        <br><br>
+
+        <button onclick="discoverWand()">Find My Wand</button>
+
+        <div id="wand-result"></div>
+    </div>
+
+    <script>
+        /* =========================================================
+           🪄 STUDENT TASK 4: JAVASCRIPT
+           Add some new types of wood to the array below!
+        ========================================================= */
+        function discoverWand() {
+            let core = document.getElementById("core").value;
+            let flexibility = document.getElementById("flexibility").value;
+
+            let woods = ["Holly", "Vine", "Ash", "Elder", "Willow", "Mahogany"];
+            let randomWood = woods[Math.floor(Math.random() * woods.length)];
+            let length = Math.floor(Math.random() * (14 - 9 + 1)) + 9;
+
+            /* =========================================================
+               🪄 STUDENT TASK 5: Change Ollivander's message!
+            ========================================================= */
+            let message = "Curious... very curious. Your perfect match is " 
+                        + randomWood + ", " + length + " inches, with a " 
+                        + core + " core. Quite " + flexibility.toLowerCase() + "!";
+
+            document.getElementById("wand-result").innerText = message;
+
+            // --- NETWORK SAVE LOGIC ---
+            let wandData = {
+                wood: randomWood,
+                core: core,
+                flexibility: flexibility,
+                length: length
+            };
+
+            // Direct fetch to the PHP script on CloudNext
+            fetch('save_wand.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(wandData)
+            })
+            .then(response => response.json())
+            .then(data => console.log("Server response:", data))
+            .catch(error => console.error("Error saving wand:", error));
+        }
+    </script>
+</body>
+</html>
+        </textarea>
+    </div>
+
+    <script>
+        const drawer = document.getElementById('editor-drawer');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const runBtn = document.getElementById('run-btn');
+        const editor = document.getElementById('code-editor');
+        const previewFrame = document.getElementById('preview-frame');
+
+        function updateLivePage() {
+            const studentCode = editor.value;
+            const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            
+            // Re-write the iframe contents
+            frameDoc.open();
+            frameDoc.write(studentCode);
+            frameDoc.close();
+        }
+
+        // Render immediately on load
+        updateLivePage();
+
+        toggleBtn.addEventListener('click', () => {
+            drawer.classList.add('open');
+            toggleBtn.style.display = 'none'; 
+        });
+
+        closeBtn.addEventListener('click', () => {
+            drawer.classList.remove('open');
+            toggleBtn.style.display = 'block'; 
+        });
+
+        runBtn.addEventListener('click', updateLivePage);
+
+        // Allow tab key formatting in the text area
+        editor.addEventListener('keydown', function(e) {
+            if (e.key == 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 1;
+            }
+        });
+    </script>
+</body>
+</html>
