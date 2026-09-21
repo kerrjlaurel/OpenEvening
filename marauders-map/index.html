@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marauder's Cyber Challenge</title>
+    <style>
+        :root {
+            --parchment: #f4e4bc;
+            --ink: #3a2e1d;
+            --accent: #8b6d43;
+        }
+
+        body {
+            background-color: #111;
+            color: var(--ink);
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGO INTEGRATION --- */
+        .school-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 250px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+
+        .map-container {
+            background-color: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid var(--accent);
+            position: relative;
+            transition: 0.3s ease;
+        }
+
+        h1 {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        /* --- CHALLENGE SECTION --- */
+        .clue-section {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px dashed var(--accent);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .cipher-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5em;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        /* --- PURE CSS PIGPEN CIPHER --- */
+        .pigpen-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .pigpen-char {
+            width: 25px;
+            height: 25px;
+            position: relative;
+            border-color: var(--ink);
+        }
+
+        .dot::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--ink);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .x-grid { transform: rotate(45deg); margin: 0 5px;}
+        .x-grid.dot::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+        .pp-A, .pp-J { border-right: 3px solid; border-bottom: 3px solid; }
+        .pp-B, .pp-K { border-right: 3px solid; border-bottom: 3px solid; border-left: 3px solid; }
+        .pp-C, .pp-L { border-left: 3px solid; border-bottom: 3px solid; }
+        .pp-D, .pp-M { border-top: 3px solid; border-right: 3px solid; border-bottom: 3px solid; }
+        .pp-E, .pp-N { border: 3px solid; }
+        .pp-F, .pp-O { border-top: 3px solid; border-left: 3px solid; border-bottom: 3px solid; }
+        .pp-G, .pp-P { border-top: 3px solid; border-right: 3px solid; }
+        .pp-H, .pp-Q { border-top: 3px solid; border-left: 3px solid; border-right: 3px solid; }
+        .pp-I, .pp-R { border-top: 3px solid; border-left: 3px solid; }
+
+        .pp-S, .pp-W { border-top: 3px solid; border-left: 3px solid; }
+        .pp-T, .pp-X { border-top: 3px solid; border-right: 3px solid; }
+        .pp-U, .pp-Y { border-bottom: 3px solid; border-left: 3px solid; }
+        .pp-V, .pp-Z { border-bottom: 3px solid; border-right: 3px solid; }
+
+        /* --- TOOLBOX DRAWER --- */
+        .drawer-toggle {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--accent);
+            color: white;
+            padding: 15px 10px;
+            cursor: pointer;
+            border-radius: 5px 0 0 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            z-index: 1001;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.2em;
+            transition: right 0.4s ease;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            user-select: none;
+        }
+
+        .drawer-toggle:hover { background-color: #5c472a; }
+        .drawer-toggle.open { right: 380px; } 
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -380px; 
+            width: 380px;
+            height: 100vh;
+            background-color: var(--parchment);
+            background-image: url('https://www.transparenttextures.com/patterns/old-wall.png');
+            box-shadow: -5px 0 15px rgba(0,0,0,0.8);
+            transition: right 0.4s ease;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            border-left: 3px solid var(--accent);
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .drawer.open { right: 0; }
+
+        .drawer h2 {
+            font-family: 'Courier New', Courier, monospace;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* Tool Switcher */
+        .tool-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tool-btn {
+            background: none;
+            border: 2px solid var(--accent);
+            padding: 8px 12px;
+            font-family: inherit;
+            color: var(--ink);
+            cursor: pointer;
+            border-radius: 3px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .tool-btn:hover { background: rgba(139, 109, 67, 0.2); }
+        .tool-btn.active { background: var(--accent); color: white; }
+
+        .tool-content { display: none; animation: fadeIn 0.3s; }
+        .tool-content.active-tool { display: block; }
+
+        /* Caesar Tool Specifics */
+        .tool-box {
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px dashed var(--accent);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .caesar-tool input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .slider-row button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .slider-row button:hover { background: #5c472a; }
+        .caesar-tool input[type="range"] { flex-grow: 1; }
+        
+        .caesar-tool-output {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.4em;
+            min-height: 30px;
+            font-weight: bold;
+            color: #2a5522;
+            margin-top: 15px;
+        }
+
+        /* Pigpen Reference - Scaled Down */
+        .pigpen-ref-image {
+            width: 100%;
+            max-width: 150px; 
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Input Area */
+        .input-area { margin-top: 30px; }
+        input[type="text"].guess-box {
+            padding: 10px;
+            font-size: 1.2em;
+            font-family: 'Courier New', Courier, monospace;
+            border: 2px solid var(--accent);
+            background: #fffdf5;
+            width: 70%;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        button.action-btn {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+        button.action-btn:hover { background-color: #5c472a; }
+
+        /* Reward Section */
+        #reward-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        #reward-section img {
+            width: 250px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #d4af37;
+            animation: float 3s ease-in-out infinite;
+        }
+        .success-msg { font-size: 1.5em; color: #27632a; font-weight: bold; margin-top: 15px; }
+
+        /* Fullscreen Video Overlay */
+        #video-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #video-overlay.show-overlay {
+            opacity: 1;
+        }
+
+        #video-overlay video {
+            width: 90%;
+            max-width: 1000px; 
+            border-radius: 15px;
+            box-shadow: 0 0 40px #d4af37;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); box-shadow: 0 0 30px #d4af37; }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Responsive adjustments for Logo and Layout */
+        @media (max-width: 1200px) {
+            body {
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+            .school-logo {
+                position: static;
+                margin-bottom: 20px;
+                margin-top: 20px;
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .map-container { margin-right: 40px; margin-left: 40px; width: auto; } 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- School Branding Logo -->
+    <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel" class="school-logo">
+
+    <!-- Fullscreen Video Overlay -->
+    <div id="video-overlay">
+        <video id="win-video" src="mm_bear_video.mp4" playsinline></video>
+    </div>
+
+    <div class="map-container" id="main-container">
+        <h1>Directory of Secrets</h1>
+        <p class="subtitle">I solemnly swear that I am up to no good...</p>
+
+        <div id="puzzles">
+            <div class="clue-section">
+                <h3>Clue 1: The Caesar Cipher</h3>
+                <p>Shift the letters backwards by <strong><span id="shift-val"></span></strong> to reveal the first word.</p>
+                <div class="cipher-text" id="caesar-output"></div>
+            </div>
+
+            <div class="clue-section">
+                <h3>Clue 2: The Pigpen Cipher</h3>
+                <p>Decode the geometric symbols to reveal the second word.</p>
+                <div class="pigpen-container" id="pigpen-output"></div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="guess-input" class="guess-box" placeholder="Type the full phrase here..." autocomplete="off">
+                <br><br>
+                <button class="action-btn" onclick="checkAnswer()">Unlock Directory</button>
+                <p id="error-msg" style="color: red; display: none;">Incorrect phrase. Try again!</p>
+            </div>
+        </div>
+
+        <div id="reward-section">
+            <p class="success-msg" id="success-text">Mischief Managed! The Directory is Unlocked.</p>
+			<img src="mm_bear.jpg" alt="Magical Care Bear">
+            <audio id="success-sound" src="harry-potter-hedwigs-theme-short.mp3"></audio>
+        </div>
+    </div>
+
+    <div class="drawer-toggle" id="drawer-btn" onclick="toggleDrawer()">
+        &#9664; Toolbox
+    </div>
+
+    <div class="drawer" id="toolbox-drawer">
+        <h2>Cyber Toolbox</h2>
+        
+        <div class="tool-switcher">
+            <button class="tool-btn active" onclick="switchTool('caesar-tool')">Caesar Wheel</button>
+            <button class="tool-btn" onclick="switchTool('pigpen-tool')">Pigpen Key</button>
+        </div>
+
+        <div id="caesar-tool" class="tool-content active-tool tool-box caesar-tool">
+            <p style="font-size: 0.9em;">Type scrambled text and adjust shift to decode!</p>
+            <input type="text" id="tool-input" placeholder="Enter text..." oninput="updateCaesarTool()">
+            
+            <label>Shift Value: <strong id="tool-shift-val">0</strong></label>
+            <div class="slider-row">
+                <button onclick="adjustShift(-1)">-</button>
+                <input type="range" id="tool-shift" min="-25" max="25" value="0" oninput="updateCaesarTool()">
+                <button onclick="adjustShift(1)">+</button>
+            </div>
+            
+            <div class="caesar-tool-output" id="tool-output"></div>
+        </div>
+
+        <div id="pigpen-tool" class="tool-content tool-box">
+            <p style="font-size: 0.9em;">Use these grids to match the shapes.</p>
+            
+            <svg viewBox="0 0 110 440" class="pigpen-ref-image" xmlns="http://www.w3.org/2000/svg">
+                <g fill="var(--ink)" font-size="16" font-family="'Courier New', Courier, monospace" font-weight="bold">
+                    
+                    <path d="M 40,10 v 90 M 70,10 v 90 M 10,40 h 90 M 10,70 h 90" stroke="var(--ink)" stroke-width="2" fill="none"/>
+                    <text x="25" y="32" text-anchor="middle">A</text>
+                    <text x="55" y="32" text-anchor="middle">B</text>
+                    <text x="85" y="32" text-anchor="middle">C</text>
+                    <text x="25" y="62" text-anchor="middle">D</text>
+                    <text x="55" y="62" text-anchor="middle">E</text>
+                    <text x="85" y="62" text-anchor="middle">F</text>
+                    <text x="25" y="92" text-anchor="middle">G</text>
+                    <text x="55" y="92" text-anchor="middle">H</text>
+                    <text x="85" y="92" text-anchor="middle">I</text>
+
+                    <path d="M 40,120 v 90 M 70,120 v 90 M 10,150 h 90 M 10,180 h 90" stroke="var(--ink)" stroke-width="2" fill="none"/>
+                    <circle cx="25" cy="126" r="2.5"/> <text x="25" y="144" text-anchor="middle">J</text>
+                    <circle cx="55" cy="126" r="2.5"/> <text x="55" y="144" text-anchor="middle">K</text>
+                    <circle cx="85" cy="126" r="2.5"/> <text x="85" y="144" text-anchor="middle">L</text>
+                    <circle cx="25" cy="156" r="2.5"/> <text x="25" y="174" text-anchor="middle">M</text>
+                    <circle cx="55" cy="156" r="2.5"/> <text x="55" y="174" text-anchor="middle">N</text>
+                    <circle cx="85" cy="156" r="2.5"/> <text x="85" y="174" text-anchor="middle">O</text>
+                    <circle cx="25" cy="186" r="2.5"/> <text x="25" y="204" text-anchor="middle">P</text>
+                    <circle cx="55" cy="186" r="2.5"/> <text x="55" y="204" text-anchor="middle">Q</text>
+                    <circle cx="85" cy="186" r="2.5"/> <text x="85" y="204" text-anchor="middle">R</text>
+
+                    <path d="M 10,230 L 100,320 M 10,320 L 100,230" stroke="var(--ink)" stroke-width="2" fill="none"/>
+                    <text x="55" y="255" text-anchor="middle">V</text>
+                    <text x="28" y="282" text-anchor="middle">T</text>
+                    <text x="82" y="282" text-anchor="middle">U</text>
+                    <text x="55" y="310" text-anchor="middle">S</text>
+
+                    <path d="M 10,340 L 100,430 M 10,430 L 100,340" stroke="var(--ink)" stroke-width="2" fill="none"/>
+                    <circle cx="55" cy="352" r="2.5"/> <text x="55" y="372" text-anchor="middle">Z</text>
+                    <circle cx="31" cy="385" r="2.5"/> <text x="45" y="390" text-anchor="middle">X</text>
+                    <circle cx="79" cy="385" r="2.5"/> <text x="65" y="390" text-anchor="middle">Y</text>
+                    <circle cx="55" cy="416" r="2.5"/> <text x="55" y="402" text-anchor="middle">W</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        /* --- CHALLENGE LOGIC --- */
+		const phrases = [
+			// Original phrases
+			{ w1: "EXPECTO", w2: "PATRONUM" },
+			{ w1: "MISCHIEF", w2: "MANAGED" },
+			{ w1: "LUMOS", w2: "MAXIMA" },
+			{ w1: "SEEKER", w2: "CAUGHT" },
+			{ w1: "GOLDEN", w2: "SNITCH" }, // <-- Added missing comma here!
+
+			// Spells & Magic
+			{ w1: "WINGARDIUM", w2: "LEVIOSA" },
+			{ w1: "RIDDIKULUS", w2: "BOGGART" },
+			{ w1: "EXPELLIARMUS", w2: "DISARM" },
+			{ w1: "ALOHOMORA", w2: "UNLOCK" },
+			{ w1: "OBLIVIATE", w2: "MEMORY" },
+			{ w1: "ACCIO", w2: "FIREBOLT" },
+
+			// Magical Objects & Items
+			{ w1: "SORTING", w2: "HAT" },
+			{ w1: "POLYJUICE", w2: "POTION" },
+			{ w1: "CHOCOLATE", w2: "FROGS" },
+			{ w1: "MARAUDERS", w2: "MAP" },
+			{ w1: "INVISIBILITY", w2: "CLOAK" },
+			{ w1: "TIME", w2: "TURNER" },
+			{ w1: "MONSTER BOOK", w2: "OF MONSTERS" },
+			{ w1: "SWORD OF", w2: "GRYFFINDOR" },
+
+			// Locations & Houses
+			{ w1: "DIAGON", w2: "ALLEY" },
+			{ w1: "WHOMPING", w2: "WILLOW" },
+			{ w1: "CHAMBER OF", w2: "SECRETS" },
+			{ w1: "HUFFLEPUFF", w2: "RAVENCLAW" },
+			{ w1: "PLATFORM", w2: "NINE AND THREE QUARTERS" },
+
+			// Characters & Creatures
+			{ w1: "SIRIUS", w2: "BLACK" },
+			{ w1: "SEVERUS", w2: "SNAPE" },
+			{ w1: "RUBEUS", w2: "HAGRID" },
+			{ w1: "CORNISH", w2: "PIXIES" },
+			{ w1: "BASILISK", w2: "FANG" },
+
+			// Famous Quotes (Punctuation removed for easier matching)
+			{ w1: "I SOLEMNLY SWEAR", w2: "THAT I AM UP TO NO GOOD" },
+			{ w1: "YER A WIZARD", w2: "HARRY" },
+			{ w1: "AFTER ALL THIS TIME", w2: "ALWAYS" },
+			{ w1: "DOBBY IS", w2: "A FREE ELF" },
+			{ w1: "DON'T LET THE MUGGLES", w2: "GET YOU DOWN" }
+		];
+		
+
+        let currentPhrase = {};
+
+        function shiftText(str, shift) {
+            return str.split('').map(char => {
+                if (char.match(/[A-Z]/)) {
+                    let code = char.charCodeAt(0);
+                    return String.fromCharCode((((code - 65 + shift) % 26) + 26) % 26 + 65);
+                }
+                return char;
+            }).join('');
+        }
+
+        function renderPigpen(word) {
+            const container = document.getElementById('pigpen-output');
+            container.innerHTML = '';
+            
+            word.split('').forEach(char => {
+                if(char.match(/[A-Z]/)) {
+                    const div = document.createElement('div');
+                    div.className = `pigpen-char pp-${char}`;
+                    if("JKLMNOPQRWXYZ".includes(char)) div.classList.add('dot');
+                    if("STUVWXYZ".includes(char)) div.classList.add('x-grid');
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        function initChallenge() {
+            currentPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            const shift = Math.floor(Math.random() * 5) + 2; 
+            document.getElementById('shift-val').innerText = shift;
+            document.getElementById('caesar-output').innerText = shiftText(currentPhrase.w1, shift);
+            renderPigpen(currentPhrase.w2);
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('guess-input').value.toUpperCase().trim();
+            const correctAnswer = `${currentPhrase.w1} ${currentPhrase.w2}`;
+            
+            if (input === correctAnswer || input === currentPhrase.w1 + currentPhrase.w2) {
+                // Hide Puzzles
+                document.getElementById('puzzles').style.display = 'none';
+                
+                // Close Toolbox if open
+                if (document.getElementById('toolbox-drawer').classList.contains('open')) toggleDrawer();
+                document.getElementById('drawer-btn').style.display = 'none';
+
+                // Handle the Video Overlay
+                const overlay = document.getElementById('video-overlay');
+                const winVideo = document.getElementById('win-video');
+                
+                overlay.style.display = 'flex';
+                
+                setTimeout(() => {
+                    overlay.classList.add('show-overlay');
+                    winVideo.play();
+                }, 50);
+
+            winVideo.onended = function() {
+				overlay.classList.remove('show-overlay');
+            
+				// --- NEW LINE: Update the success message with the decoded phrase ---
+				document.getElementById('success-text').innerHTML = `Mischief Managed!<br>Phrase: ${correctAnswer}<br>The Directory is Unlocked.`;
+            
+				setTimeout(() => {
+					overlay.style.display = 'none';
+					document.getElementById('reward-section').style.display = 'flex';
+                
+					const audio = document.getElementById('success-sound');
+					audio.volume = 0.5;
+					audio.play();
+				}, 500); 
+			};
+            } else {
+                const error = document.getElementById('error-msg');
+                error.style.display = 'block';
+                setTimeout(() => error.style.display = 'none', 2000);
+            }
+        }
+
+        /* --- DRAWER & TOOLBOX LOGIC --- */
+        function toggleDrawer() {
+            const drawer = document.getElementById('toolbox-drawer');
+            const btn = document.getElementById('drawer-btn');
+            
+            if(drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                btn.classList.remove('open');
+                btn.innerHTML = '&#9664; Toolbox';
+            } else {
+                drawer.classList.add('open');
+                btn.classList.add('open');
+                btn.innerHTML = 'Toolbox &#9654;';
+            }
+        }
+
+        function switchTool(toolId) {
+            document.querySelectorAll('.tool-content').forEach(tool => tool.classList.remove('active-tool'));
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(toolId).classList.add('active-tool');
+            event.currentTarget.classList.add('active');
+        }
+
+        function updateCaesarTool() {
+            const input = document.getElementById('tool-input').value.toUpperCase();
+            const shift = parseInt(document.getElementById('tool-shift').value);
+            
+            document.getElementById('tool-shift-val').innerText = shift;
+            document.getElementById('tool-output').innerText = shiftText(input, shift);
+        }
+
+        function adjustShift(delta) {
+            const slider = document.getElementById('tool-shift');
+            let newVal = parseInt(slider.value) + delta;
+            
+            if(newVal > 25) newVal = 25;
+            if(newVal < -25) newVal = -25;
+            
+            slider.value = newVal;
+            updateCaesarTool();
+        }
+
+        window.onload = initChallenge;
+    </script>
+</body>
+</html>
