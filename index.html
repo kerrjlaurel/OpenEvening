@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Laurel - Magical Computing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --laurel-navy: #1C2B59;
+            --laurel-gold: #E8A81D;
+            --laurel-burgundy: #7C1E37;
+            --parchment: #FDFBF7;
+            --parchment-dark: #EAE3D2;
+            --text-dark: #1A1A1A;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Lora', serif;
+            background-color: var(--parchment);
+            background-image: 
+                radial-gradient(circle at center, transparent 0%, var(--parchment-dark) 150%),
+                url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh; /* Locks body to exactly window height */
+            overflow: hidden; /* Prevents scrolling */
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            padding: 1rem 1rem 0.5rem 1rem;
+            flex-shrink: 0; /* Prevents header from being squished */
+        }
+
+        .banner-img {
+            max-height: 14vh; /* Scales banner relative to screen size */
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid var(--laurel-gold);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--laurel-navy);
+            font-size: 2rem;
+            margin: 0.5rem 0 0 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--laurel-burgundy);
+            font-style: italic;
+            margin-top: 0.2rem;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Strict 2 columns */
+            grid-template-rows: 1fr 1fr; /* Strict 2 rows */
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            box-sizing: border-box;
+            flex-grow: 1; /* Forces grid to fill remaining vertical space */
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid var(--laurel-navy);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Spaces content evenly */
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--laurel-navy), var(--laurel-gold), var(--laurel-burgundy));
+            transition: height 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 8px 16px rgba(28, 43, 89, 0.2);
+            background: white;
+            border-color: var(--laurel-gold);
+        }
+
+        .card:hover::before {
+            height: 10px;
+        }
+
+        .card h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--laurel-navy);
+            font-size: 1.3rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 0.5rem 0;
+            overflow: hidden; /* Keeps text tidy if screen is very small */
+        }
+
+        .tech-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto; /* Pushes tags to the bottom */
+        }
+
+        .tag {
+            font-family: sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            background: var(--parchment-dark);
+            color: var(--laurel-burgundy);
+            border: 1px solid var(--laurel-burgundy);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: rgba(232, 168, 29, 0.3);
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* Fallback for smaller screens to ensure readability */
+        @media (max-width: 768px) {
+            body { height: auto; overflow: auto; }
+            .dashboard-container { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .banner-img { max-height: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel" class="banner-img">
+        <h1>Computing Open Day</h1>
+        <div class="subtitle">Select your magical pathway</div>
+    </header>
+
+    <main class="dashboard-container">
+        
+        <a href="sorting-hat/index.html" class="card">
+            <span class="card-number">1</span>
+            <h2>The Digital Sorting Hat</h2>
+            <p>Discover the logic behind the magic! Learn how simple conditional logic (if/else) transforms a micro:bit into the famous Sorting Hat.</p>
+            <div class="tech-tags">
+                <span class="tag">Micro:bit</span>
+                <span class="tag">Python</span>
+            </div>
+        </a>
+
+        <a href="marauders-map/index.html" class="card">
+            <span class="card-number">2</span>
+            <h2>Marauder’s Map Challenge</h2>
+            <p>Step into the role of a codebreaker. Decrypt hidden clues using classic ciphers to unlock the hidden magical directory on our network.</p>
+            <div class="tech-tags">
+                <span class="tag">Cryptography</span>
+                <span class="tag">Logic</span>
+            </div>
+        </a>
+
+        <a href="diagon-alley/index.html" class="card">
+            <span class="card-number">3</span>
+            <h2>Ollivanders' Wand Selector</h2>
+            <p>The wand chooses the wizard! Tweak the front-end code of our Diagon Alley shop to calculate and style your perfect magical match.</p>
+            <div class="tech-tags">
+                <span class="tag">HTML / CSS</span>
+                <span class="tag">JavaScript</span>
+            </div>
+        </a>
+
+        <a href="diagon-alley/index_2.html" class="card">
+            <span class="card-number">4</span>
+            <h2>O.W.L Typing Exam</h2>
+            <p>Mount your broomstick and catch the Snitch! Debug our broken game code by dragging and dropping the correct blocks to achieve the high score.</p>
+            <div class="tech-tags">
+                <span class="tag">Keyboard Skills</span>
+                <span class="tag">Acuracy</span>
+				<span class="tag">Speed</span>
+
+            </div>
+        </a>
+	<div class="tech-tags"><center>
+		<a href="diagon-alley/dashboard.html">
+                <span class="tag">Dashboard</span>
+        </a>
+	</div>
+
+    </main>
+
+</body>
+</html>
