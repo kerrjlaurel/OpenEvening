@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O.W.L. Typing Exam</title>
+    
+    <!-- ⚠️ NEW: Load the auto-generated server IP config -->
+    <script src="server_config.js"></script>
+
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f4f1ea;
+            color: #2c2f33;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid #d4af37;
+        }
+        h1 { color: #5d0000; }
+        .target-text {
+            font-size: 1.2em;
+            background: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            user-select: none;
+        }
+        textarea, input {
+            width: 90%;
+            padding: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #d4af37;
+            color: white;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #b5952f; }
+        #test-area, #results-area { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ Hogwarts O.W.L. Typing Exam ✨</h1>
+    
+    <div id="setup-area">
+        <p>Enter your name to begin your examination:</p>
+        <input type="text" id="wizard-name" placeholder="E.g. Hermione Granger">
+        <br>
+        <button onclick="startSetup()">Prepare Scroll</button>
+    </div>
+
+    <div id="test-area">
+        <p>Type the following magical incantation as fast as you can. The timer starts on your first keystroke!</p>
+        <div class="target-text" id="target-text">We are pleased to inform you that you have a place at Hogwarts School of Witchcraft and Wizardry.</div>
+        <textarea id="typing-input" rows="4" placeholder="Begin typing here..."></textarea>
+    </div>
+
+    <div id="results-area">
+        <h2>⚡ Mischief Managed! ⚡</h2>
+        <p id="time-display"></p>
+        <p id="wpm-display"></p>
+        <p><em>Your results have been sent to the Diagon Alley archives!</em></p>
+        <button onclick="location.reload()">Next Wizard</button>
+    </div>
+</div>
+
+<script>
+    const targetText = document.getElementById('target-text').innerText;
+    const inputArea = document.getElementById('typing-input');
+    let startTime, endTime, timerStarted = false;
+    let wizardName = "";
+
+    function startSetup() {
+        wizardName = document.getElementById('wizard-name').value.trim();
+        if (!wizardName) return alert("Please enter your name!");
+        
+        document.getElementById('setup-area').style.display = 'none';
+        document.getElementById('test-area').style.display = 'block';
+        inputArea.focus();
+    }
+
+    inputArea.addEventListener('input', () => {
+        // Start timer on first keystroke
+        if (!timerStarted) {
+            startTime = new Date();
+            timerStarted = true;
+        }
+
+        // Check if they finished typing the exact text
+        if (inputArea.value === targetText) {
+            endTime = new Date();
+            inputArea.disabled = true;
+            calculateAndSave();
+        }
+    });
+
+    function calculateAndSave() {
+        const timeTakenSec = ((endTime - startTime) / 1000).toFixed(2);
+        const wordCount = targetText.split(' ').length;
+        const wpm = Math.round((wordCount / (timeTakenSec / 60)));
+
+        document.getElementById('test-area').style.display = 'none';
+        document.getElementById('results-area').style.display = 'block';
+        document.getElementById('time-display').innerText = `Time: ${timeTakenSec} seconds`;
+        document.getElementById('wpm-display').innerText = `Speed: ${wpm} WPM`;
+
+        // Create the JSON payload
+        const record = {
+            name: wizardName,
+            time_seconds: parseFloat(timeTakenSec),
+            wpm: wpm,
+            timestamp: new Date().toISOString()
+        };
+
+        // ⚠️ FIXED: Send to our local Python server using the dynamic SERVER_URL
+        if (typeof SERVER_URL !== 'undefined') {
+            fetch(`${SERVER_URL}/save-score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record)
+            }).then(response => {
+                console.log("Saved to Diagon Alley archives!");
+            }).catch(error => {
+                console.error("Error saving score:", error);
+            });
+        } else {
+            console.error("SERVER_URL is missing. Please ensure server_config.js is loading correctly.");
+        }
+    }
+</script>
+
+</body>
+</html>
