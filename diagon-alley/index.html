@@ -135,6 +135,29 @@
             padding: 50px;
         }
 
+        /* Flexbox layout to put the logo and the shop side-by-side */
+        .page-layout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Removed the large gap to allow for the overlap */
+            gap: 0px; 
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .house-logo-display {
+            height: 250px; 
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 5px 15px rgba(0,0,0,0.4));
+            
+            /* These three lines create the overlap */
+            position: relative;
+            z-index: 10; /* Ensures the logo sits on top of the container */
+            margin-right: -40px; /* Pulls the logo to the right, over the container */
+        }
+
         /* 🪄 STUDENT TASK 2: Change the border thickness or color */
         .shop-container {
             background-color: rgba(255, 255, 255, 0.85);
@@ -142,8 +165,10 @@
             border-radius: 15px;
             padding: 40px;
             max-width: 600px;
-            margin: 0 auto;
             box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+            /* Added position relative so it respects the z-index stacking */
+            position: relative; 
+            z-index: 1;
         }
 
         select, button {
@@ -182,58 +207,86 @@
 </head>
 <body>
 
-    <div class="shop-container">
-        <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel Academy Logo" class="school-logo">
+    <div class="page-layout">
         
-        <h1>Ollivanders: Makers of Fine Wands</h1>
-        <p>Enter your traits below to let the wand choose the wizard...</p>
+        <!-- =========================================================
+           🪄 STUDENT TASK 3: HTML
+           Change the image src to match your house!
+           Options: 
+		   hogwarts.png
+		   gryffindor.png
+		   slytherin.png
+		   ravenclaw.png
+		   hufflepuff.png
+        ========================================================= -->
+        <img src="hogwarts_school_crest.png" alt="House Logo" class="house-logo-display">
 
-        <label for="core">Select your preferred core:</label><br>
-        <select id="core">
-            <option value="Dragon Heartstring">Dragon Heartstring</option>
-            <option value="Phoenix Feather">Phoenix Feather</option>
-            <option value="Unicorn Hair">Unicorn Hair</option>
-        </select>
-        <br><br>
+        <div class="shop-container">
+            <img src="Delta_Laurel_HP.jpg" alt="Delta The Laurel Academy Logo" class="school-logo">
+            
+            
+            <h1>Ollivanders: Makers of Fine Wands</h1>
+            <p>Enter your traits below to let the wand choose the wizard...</p>
 
-        <label for="flexibility">Wand flexibility:</label><br>
-        <select id="flexibility">
-            <option value="Rigid">Rigid</option>
-            <option value="Swishy">Swishy</option>
-            <option value="Springy">Springy</option>
-        </select>
-        <br><br>
+            <label for="wood">Select your wood:</label><br>
+            <select id="wood">
+                <option value="Holly">Holly</option>
+                <option value="Vine">Vine</option>
+                <option value="Ash">Ash</option>
+                <option value="Elder">Elder</option>
+                <option value="Willow">Willow</option>
+                <option value="Mahogany">Mahogany</option>
+                <!-- =========================================================
+                   🪄 STUDENT TASK 4: HTML
+                   Add some new types of wood to this dropdown list!
+                ========================================================= -->
+            </select>
+            <br><br>
 
-        <button onclick="discoverWand()">Find My Wand</button>
+            <label for="core">Select your preferred core:</label><br>
+            <select id="core">
+                <option value="Dragon Heartstring">Dragon Heartstring</option>
+                <option value="Phoenix Feather">Phoenix Feather</option>
+                <option value="Unicorn Hair">Unicorn Hair</option>
+            </select>
+            <br><br>
 
-        <div id="wand-result"></div>
+            <label for="flexibility">Wand flexibility:</label><br>
+            <select id="flexibility">
+                <option value="Rigid">Rigid</option>
+                <option value="Swishy">Swishy</option>
+                <option value="Springy">Springy</option>
+            </select>
+            <br><br>
+
+            <button onclick="discoverWand()">Find My Wand</button>
+
+            <div id="wand-result"></div>
+        </div>
     </div>
 
     <script>
-        /* =========================================================
-           🪄 STUDENT TASK 4: JAVASCRIPT
-           Add some new types of wood to the array below!
-        ========================================================= */
         function discoverWand() {
+            let wood = document.getElementById("wood").value;
             let core = document.getElementById("core").value;
             let flexibility = document.getElementById("flexibility").value;
 
-            let woods = ["Holly", "Vine", "Ash", "Elder", "Willow", "Mahogany"];
-            let randomWood = woods[Math.floor(Math.random() * woods.length)];
+            // Generate a random length
             let length = Math.floor(Math.random() * (14 - 9 + 1)) + 9;
 
             /* =========================================================
-               🪄 STUDENT TASK 5: Change Ollivander's message!
+               🪄 STUDENT TASK 5: JAVASCRIPT
+               Change Ollivander's message!
             ========================================================= */
             let message = "Curious... very curious. Your perfect match is " 
-                        + randomWood + ", " + length + " inches, with a " 
+                        + wood + ", " + length + " inches, with a " 
                         + core + " core. Quite " + flexibility.toLowerCase() + "!";
 
             document.getElementById("wand-result").innerText = message;
 
             // --- NETWORK SAVE LOGIC ---
             let wandData = {
-                wood: randomWood,
+                wood: wood,
                 core: core,
                 flexibility: flexibility,
                 length: length
